@@ -23,3 +23,29 @@ get('something', function(data) {
 
 This is also commonly referred to as callback hell. http://callbackhell.com
 
+*What if there was a way to simplify logical predicates?*
+
+# Examples
+
+```
+get('posts', function(posts) {
+  var stickyPosts = _.select(posts, predicate('sticky'));
+});
+```
+
+But wait there's more!
+
+You can do use any javascript operator or gate
+`|| && + - / * < > <= >= == !=`
+
+```
+var recentPosts = _.select(posts, predicate('sticky').or('timestamp').gt(new Date('2016-1-1')))
+```
+
+# Usage
+```
+predicate(attribute)
+```
+predicate returns a matcher object, on which you can call any of the chain functions `and, or, gt, lt, gte, lte, eq, ne, add, sub, mult, div, strictEq, strictNeq`
+
+More to come. Enjoy!
