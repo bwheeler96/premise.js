@@ -21,7 +21,7 @@ describe('Premise.js', function() {
     }
   ];
 
-  it('uses defaults to a noop function', function() {
+  it('defaults to a noop function', function() {
     var withPremise = _.map(integers, premise());
     expect(integers).toEqual(withPremise);
   });
@@ -29,6 +29,15 @@ describe('Premise.js', function() {
   it('accepts chained premises on default', function() {
     var withPremise = _.map(strings, premise().eq('banana'));
     expect(withPremise).toEqual([false, false, true, false]);
+    var withPremise = _.map(strings, premise.eq('banana'));
+    expect(withPremise).toEqual([false, false, true, false]);
+  });
+
+  it('rejects not equal', function() {
+    var notSticky = _.reject(posts, premise('sticky').ne(true));
+    expect(notSticky).toEqual([ posts[0] ]);
+    var not246or8 = _.select(integers, premise().ne(2).and().ne(4).and().ne(6));
+    expect(not246or8).toEqual([1, 3, 5, 7])
   });
 
   it('accepts an attributes with noop', function() {
@@ -52,5 +61,29 @@ describe('Premise.js', function() {
   it('accepts chained OR premises with a property', function() {
     var stickyOrRecent = _.select(posts, premise('sticky').eq(true).or('date').gt(new Date('2009-12-31')));
     expect(stickyOrRecent).toEqual([ posts[0], posts[2] ]);
+  });
+
+  it('adds to integers', function() {
+    var plusOne = _.map(integers, premise.add(1));
+    expect(plusOne).toEqual([2, 3, 4, 5, 6, 7, 8]);
+  });
+
+  it('subtracts integers', function() {
+    var minusOne = _.map(integers, premise.sub(1));
+  });
+
+  it('multiplies integers', function() {
+    var mult10 = _.map(integers, premise.mult(10));
+    expect(mult10).toEqual([10, 20, 30, 40, 50, 60, 70]);
+  });
+
+  it('divides integers', function() {
+    var divZero = _.map(integers, premise.div(10));
+    expect(divZero).toEqual([.1, .2, .3, .4, .5, .6, .7]);
+  });
+
+  it('modulos integers', function() {
+    var mod2 = _.map(integers, premise.mod(2));
+    expect(mod2).toEqual([1, 0, 1, 0, 1, 0, 1]);
   });
 });
