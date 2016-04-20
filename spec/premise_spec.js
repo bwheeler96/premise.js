@@ -57,7 +57,7 @@ describe('Premise.js', function() {
   });
 
   it('maps numbers with less than', function() {
-    var lt4 = _.map(integers, premise().lt(4));
+    var lt4 = _.map(integers, premise.lt(4));
     expect(lt4).toEqual([true, true, true, false, false, false, false]);
   });
 
@@ -67,7 +67,7 @@ describe('Premise.js', function() {
   });
 
   it('adds to integers', function() {
-    var plusOne = _.map(integers, premise().add(1));
+    var plusOne = _.map(integers, premise.add(1));
     expect(plusOne).toEqual([2, 3, 4, 5, 6, 7, 8]);
   });
 
@@ -76,17 +76,17 @@ describe('Premise.js', function() {
   });
 
   it('multiplies integers', function() {
-    var mult10 = _.map(integers, premise().mul(10));
+    var mult10 = _.map(integers, premise.mul(10));
     expect(mult10).toEqual([10, 20, 30, 40, 50, 60, 70]);
   });
 
   it('divides integers', function() {
-    var divZero = _.map(integers, premise().div(10));
+    var divZero = _.map(integers, premise.div(10));
     expect(divZero).toEqual([.1, .2, .3, .4, .5, .6, .7]);
   });
 
   it('modulos integers', function() {
-    var mod2 = _.map(integers, premise().mod(2));
+    var mod2 = _.map(integers, premise.mod(2));
     expect(mod2).toEqual([1, 0, 1, 0, 1, 0, 1]);
   });
 
@@ -98,6 +98,12 @@ describe('Premise.js', function() {
   it('accepts shorthand syntax for OR', function() {
     var shorthanded = _.map(strings, premise().eq('apple').or.eq('pear'));
     expect(shorthanded).toEqual([true, true, false, false]);
+  });
+
+  it('accepts shorthand syntax for OR with not', function() {
+    var shorthanded = _.map(strings, premise.ne('apple').or.ne('pear'));
+    var expectation = _.map(strings, function(str) { return str != 'pear' || str != 'apple' });
+    expect(shorthanded).toEqual(expectation);
   });
 
   it('should use short circuit or', function() {

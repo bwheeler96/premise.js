@@ -27,7 +27,7 @@ function Premise(property) {
   }
 
   function Operator(property, predicate) {
-    this.property = property;
+    this.property  = property;
     this.predicate = predicate;
     var self = this;
     this.value = function(obj) {
@@ -84,11 +84,8 @@ function Premise(property) {
     this.orChain.push(this.andChain);
     return matcher;
   };
-  for (var name in premise.chainOperands) 
-    matcher.or[name] = function(val) {
-      return matcher.or()[name](val);
-    };
-
+  matcher.or.eq = function(val) { return matcher.or().eq(val) };
+  matcher.or.ne = function(val) { return matcher.or().ne(val) };
   matcher.and = function(property) {
     this.andChain.push(property);
     return matcher;
@@ -99,16 +96,16 @@ function Premise(property) {
 premise = Premise;
 
 premise.chainOperands = {
-  ne: function(val) {
-    return function(obj) {
-      return obj != val;
-    };
-  },
-  eq: function(val) {
-    return function(obj) {
-      return obj == val;
-    };
-  },
+  ne:       function(val) {
+              return function(obj) {
+                return obj != val;
+              };
+            },
+  eq:       function(val) {
+              return function(obj) {
+                return obj == val;
+              };
+            },
   strictEq: function(val) {
               return function(obj) {
                 return obj === val;
@@ -166,10 +163,7 @@ premise.chainOperands = {
             }
 };
 
-// TODO make these shorthand matchers work
-// Should be able to call premise.eq(true) to get => function(obj) { return obj == true } etc...
 for (var name in premise.chainOperands) {
-  premise[name] = function(val) {
-    return premise()[name](val);
-  };
+  premise[name] = premise()[name];
 }
+
