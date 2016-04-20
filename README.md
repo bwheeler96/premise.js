@@ -29,17 +29,30 @@ This is also commonly referred to as callback hell. http://callbackhell.com
 
 ```
 get('posts', function(posts) {
-  var stickyPosts = _.select(posts, predicate('sticky'));
+  var stickyPosts = _.select(posts, premise('sticky'));
 });
 ```
 
 But wait there's more!
 
-You can do use any javascript operator or gate
+You can do use any javascript operator sequence
 `|| && + - / * < > <= >= == !=`
 
 ```
-var recentPosts = _.select(posts, predicate('sticky').or('timestamp').gt(new Date('2016-1-1')))
+var recentPosts = _.select(posts, premise('pinned').or('timestamp').gt(new Date('2016-1-1')))
+
+// Say you have a date range filter
+var visiblePosts = _.select(posts, premise('date').gt(startDate).or('date').lt(endDate));
+
+// Maybe you want to translate values
+var percentages = _.map([ 0.3213, 0.5123, 0.7735 ], premise.mul(100));
+//=> [32.13, 51.23, 77.35]
+```
+
+## Nesting
+```
+var sortedPostsPremise = premise('selected').and(premise('pinned').or('date'));
+// logically equivalent to function(obj) { return obj.selected && (obj.pinned || obj.date) }
 ```
 
 # Usage
