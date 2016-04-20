@@ -7,16 +7,19 @@ describe('Premise.js', function() {
     {
       post:   'Premise.js is really cool!',
       sticky: true,
+      selected: true,
       date:   new Date('1999-12-31')
     },
     {
       post:   'How to use Premise.js with underscore or lodash',
       sticky: false,
+      selected: false,
       date:   new Date('1999-12-31')
     },
     {
       post:   'New uses for premise.js',
       sticky: false,
+      selected: true,
       date:   new Date()
     }
   ];
@@ -29,8 +32,8 @@ describe('Premise.js', function() {
   it('accepts chained premises on default', function() {
     var withPremise = _.map(strings, premise().eq('banana'));
     expect(withPremise).toEqual([false, false, true, false]);
-    var withPremise = _.map(strings, premise.eq('banana'));
-    expect(withPremise).toEqual([false, false, true, false]);
+    var withPremise = _.map(strings, premise().eq('pear'));
+    expect(withPremise).toEqual([false, true, false, false]);
   });
 
   it('rejects not equal', function() {
@@ -64,7 +67,7 @@ describe('Premise.js', function() {
   });
 
   it('adds to integers', function() {
-    var plusOne = _.map(integers, premise.add(1));
+    var plusOne = _.map(integers, premise().add(1));
     expect(plusOne).toEqual([2, 3, 4, 5, 6, 7, 8]);
   });
 
@@ -73,17 +76,37 @@ describe('Premise.js', function() {
   });
 
   it('multiplies integers', function() {
-    var mult10 = _.map(integers, premise.mult(10));
+    var mult10 = _.map(integers, premise().mul(10));
     expect(mult10).toEqual([10, 20, 30, 40, 50, 60, 70]);
   });
 
   it('divides integers', function() {
-    var divZero = _.map(integers, premise.div(10));
+    var divZero = _.map(integers, premise().div(10));
     expect(divZero).toEqual([.1, .2, .3, .4, .5, .6, .7]);
   });
 
   it('modulos integers', function() {
-    var mod2 = _.map(integers, premise.mod(2));
+    var mod2 = _.map(integers, premise().mod(2));
     expect(mod2).toEqual([1, 0, 1, 0, 1, 0, 1]);
+  });
+
+  it('should accept shorthand premise syntax', function() {
+    var shorthanded = _.map(strings, premise.eq('apple'));
+    expect(shorthanded).toEqual( _.map(strings, function(str) { return str == 'apple'; }) );
+  });
+
+  it('accepts shorthand syntax for OR', function() {
+    var shorthanded = _.map(strings, premise().eq('apple').or.eq('pear'));
+    expect(shorthanded).toEqual([true, true, false, false]);
+  });
+
+  it('should use short circuit or', function() {
+    var added = _.map(integers, premise().add(6).or().add(5));
+    expect(added).toEqual([7, 8, 9, 10, 11, 12, 13]);
+  });
+
+  it('allows premise objects to be passed in, and groups them logically', function() {
+    var complexPremise = premise('date').lt(new Date('2015-02-02')).and( premise('sticky').eq(true).or('selected').eq(true) );
+    expect(_.map(posts, complexPremise)).toEqual([ posts[0] ]);
   });
 });
