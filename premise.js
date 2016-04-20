@@ -10,6 +10,7 @@ function Premise(property) {
   var matcher = function(obj) {
     return matcher.orChain.value(obj); 
   };
+  matcher.value = matcher;
 
   for (var name in premise.chainOperands)
     premiseChainFunction(name, premise.chainOperands[name]);
@@ -39,8 +40,11 @@ function Premise(property) {
   function AndChain() {
     this.chain = [];
     var self = this;
-    this.push = function(orChain) {
-      self.chain.push(orChain);
+    this.push = function(property) {
+      if (typeof property == 'function') 
+        self.chain.push(property);
+      else
+        self.chain.push(new Operator(property, noop));
     };
     var result;
     this.value = function(obj) {
@@ -70,13 +74,13 @@ function Premise(property) {
   }
 
   matcher.andChain = new AndChain();
-  matcher.andChain.push(new Operator(property, noop));
+  matcher.andChain.push(property);
   matcher.orChain  = new OrChain();
   matcher.orChain.push(matcher.andChain);
 
   matcher.or  = function(property) {
     this.andChain = new AndChain();
-    this.andChain.push(new Operator(property, noop));
+    this.andChain.push(property);
     this.orChain.push(this.andChain);
     return matcher;
   };
@@ -86,7 +90,7 @@ function Premise(property) {
     };
 
   matcher.and = function(property) {
-    this.andChain.push(new Operator(property, noop));
+    this.andChain.push(property);
     return matcher;
   };
   return matcher;

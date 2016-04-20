@@ -107,6 +107,8 @@ describe('Premise.js', function() {
 
   it('allows premise objects to be passed in, and groups them logically', function() {
     var complexPremise = premise('date').lt(new Date('2015-02-02')).and( premise('sticky').eq(true).or('selected').eq(true) );
-    expect(_.map(posts, complexPremise)).toEqual([ posts[0] ]);
+    expect(_.select(posts, complexPremise)).toEqual([ posts[0] ]);
+    complexPremise     = premise().gt(5).or(premise().lt(4).and().gte(2));
+    expect(_.map(integers, complexPremise)).toEqual(_.map(integers, function(integer) { return integer > 5 || (integer >= 2 && integer < 4) }));
   });
 });
