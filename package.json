@@ -1,12 +1,12 @@
 {
   "name": "premise",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Simple predicate logic chaining",
   "main": "premise.js",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "underscore": "^1.8.3"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "jasmine"
   },
