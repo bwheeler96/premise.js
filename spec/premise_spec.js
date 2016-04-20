@@ -1,6 +1,6 @@
 require('../premise.js');
 var _ = require('underscore');
-describe('Premise.js', function() {
+describe('premise', function() {
   var integers = [1, 2, 3, 4, 5, 6, 7];
   var strings  = ['apple', 'pear', 'banana', 'orange'];
   var posts  = [
@@ -104,6 +104,18 @@ describe('Premise.js', function() {
     var shorthanded = _.map(strings, premise.ne('apple').or.ne('pear'));
     var expectation = _.map(strings, function(str) { return str != 'pear' || str != 'apple' });
     expect(shorthanded).toEqual(expectation);
+  });
+
+  it('accepts shorthand AND syntac', function() {
+    var shorthanded = _.map(integers, premise.mod(0).and.gt(5));
+    var expectation = _.map(integers, function(int) { return int % 0 && int > 5; });
+    expect(shorthanded).toEqual(expectation);
+  });
+
+  it('can make really long chains with a shorthand function', function() {
+    var shorthand = _.map(integers, premise.eq(1).or.eq(2).or.eq(3).and.eq(4));
+    var expectation = _.map(integers, function(i) { return i == 1 || i == 2 || i == 3 && i == 4 });
+    expect(shorthand).toEqual(expectation);
   });
 
   it('should use short circuit or', function() {
