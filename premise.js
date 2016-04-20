@@ -11,6 +11,7 @@ function Premise(property) {
     return matcher.orChain.value(obj); 
   };
   matcher.value = matcher;
+  var GATES = { AND: 0, OR: 1 };
 
   for (var name in premise.chainOperands)
     premiseChainFunction(name, premise.chainOperands[name]);
@@ -37,12 +38,13 @@ function Premise(property) {
     return this;
   }
 
-  function AndChain() {
+  function OperatorGroup(gate) {
     this.chain = [];
+    this.gate = gate;
     var self = this;
     this.push = function(property) {
-      if (typeof property == 'function') 
-        self.chain.push(property);
+      if (typeof property == 'function' || self.gate == GATES.OR) 
+        self.chain.push(property)
       else
         self.chain.push(new Operator(property, noop));
     };
@@ -50,38 +52,26 @@ function Premise(property) {
     this.value = function(obj) {
       for (var i = 0; i < self.chain.length; i++) {
         result = self.chain[i].value(obj);
-        if (!result) return result;
-      }
-      return result;
-    };
-  }
-
-  function OrChain() {
-    this.chain = [];
-    var self = this;
-    this.push = function(andChain) {
-      self.chain.push(andChain);
-    };
-    var result;
-    this.value = function(obj) {
-      for (var i = 0; i < self.chain.length; i++) {
-        result = self.chain[i].value(obj);
-        if (result)
+        if ((result && self.gate == GATES.OR) || (!result && self.gate == GATES.AND))
           return result;
       }
       return result;
     };
   }
-
-  matcher.andChain = new AndChain();
+  
+  matcher.andChain = new OperatorGroup(GATES.AND);
   matcher.andChain.push(property);
-  matcher.orChain  = new OrChain();
+  matcher.orChain  = new OperatorGroup(GATES.OR);
   matcher.orChain.push(matcher.andChain);
 
   matcher.or  = function(property) {
-    this.andChain = new AndChain();
-    this.andChain.push(property);
-    this.orChain.push(this.andChain);
+    if (typeof property == 'function') {
+      this.orChain.push(property);
+    } else {
+      this.andChain = new OperatorGroup(GATES.AND);
+      this.andChain.push(property);
+      this.orChain.push(this.andChain);
+    }
     return matcher;
   };
   matcher.and = function(property) {
@@ -190,7 +180,17 @@ premise.chainOperands = {
             }
 };
 
-for (var name in premise.chainOperands) {
-  premise[name] = premise()[name];
-}
-
+// See comment above. Figure out how to generate these functions in iteration.
+premise.eq        = function(val) { return premise().eq(val)        };
+premise.ne        = function(val) { return premise().ne(val)        };
+premise.strictEq  = function(val) { return premise().strictEq(val); };
+premise.strictNe  = function(val) { return premise().strictNe(val); };
+premise.gt        = function(val) { return premise().gt(val);       };
+premise.gte       = function(val) { return premise().gte(val);      };
+premise.lt        = function(val) { return premise().lt(val);       };
+premise.lte       = function(val) { return premise().lte(val);      };
+premise.add       = function(val) { return premise().add(val);      };
+premise.sub       = function(val) { return premise().sub(val);      };
+premise.mul       = function(val) { return premise().mul(val);      };
+premise.div       = function(val) { return premise().div(val);      };
+premise.mod       = function(val) { return premise().mod(val);      };

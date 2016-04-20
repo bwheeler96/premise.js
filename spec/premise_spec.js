@@ -124,9 +124,22 @@ describe('premise', function() {
   });
 
   it('allows premise objects to be passed in, and groups them logically', function() {
-    var complexPremise = premise('date').lt(new Date('2015-02-02')).and( premise('sticky').eq(true).or('selected').eq(true) );
-    expect(_.select(posts, complexPremise)).toEqual([ posts[0] ]);
+    var endDate = new Date('2015-02-02');
+    var complexPremise = premise('date').lt(endDate).and( premise('sticky').eq(true).or('selected').eq(true) );
+    var actual = _.select(posts, complexPremise)
+    var expected = _.select(posts, function(post) {
+      return post.date < endDate && (post.sticky == true || post.selected == true);
+    });
+    expect(actual).toEqual(actual);
     complexPremise     = premise().gt(5).or(premise().lt(4).and().gte(2));
     expect(_.map(integers, complexPremise)).toEqual(_.map(integers, function(integer) { return integer > 5 || (integer >= 2 && integer < 4) }));
+  });
+
+  it('can have doubly nested premises', function() {
+    var nested   = premise.gt(5).and().lt(7);
+    var doubleNested = premise.gt(1).and.lt(3);
+    var actual   = _.select(integers, premise.eq(4).or(nested.or(doubleNested)));
+    var expected = _.select(integers, function(i) { return i == 4 || (i > 5 && i < 7 || (i > 1 && i < 3)); });
+    expect(actual).toEqual(expected);
   });
 });
